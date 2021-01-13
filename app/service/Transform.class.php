@@ -53,7 +53,7 @@ class Transform
             }
     }
 	
-	function Dinheiro($value, $object=null, $row=null) 
+	static function Dinheiro($value, $object=null, $row=null) 
     {
             if(!$value)
             {

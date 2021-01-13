@@ -1,4 +1,7 @@
 <?php
+
+use Adianti\Core\AdiantiTemplateParser;
+
 require_once 'init.php';
 $theme  = $ini['general']['theme'];
 $class  = isset($_REQUEST['class']) ? $_REQUEST['class'] : '';

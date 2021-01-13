@@ -45,6 +45,10 @@ class VagaView extends TPage
         <td><b>Localização:</b> {$vaga->localizacao} </td>
         </tr>
         <tr>
+        <td><b>Horário de Trabalho:</b> {$vaga->horario_trabalho}</td>
+        <td><b>Salário:</b> R$".Transform::Dinheiro($vaga->salario)." </td>
+        </tr>
+        <tr>
             <td class='text-center' colspan='4'><h4>Resumo da Vaga</h4></td>
         </tr>
         <tr>

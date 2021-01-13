@@ -40,7 +40,7 @@ class UsuarioFichaView extends TRecord
 
     function get_preencheu_curriculo()
     {
-        var_dump($this->curriculo);
+        //var_dump($this->curriculo);
         if($this->curriculo==null)
         {
             return false;

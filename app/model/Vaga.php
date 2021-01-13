@@ -36,6 +36,7 @@ class Vaga extends TRecord
         parent::addAttribute('cidade_id');
         parent::addAttribute('uf_id');
         parent::addAttribute('situacao_id');
+        parent::addAttribute('horario_trabalho');
             
     }
 

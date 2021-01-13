@@ -42,6 +42,7 @@ class VagaForm extends BasePage
         $resumo = new THtmlEditor('resumo');
         $requisitos_essenciais = new THtmlEditor('requisitos_essenciais');
         $localizacao = new TEntry('localizacao');
+        $horario_trabalho = new TEntry('horario_trabalho');
         $cidade_id = new TDBUniqueSearch('cidade_id', 'geral', 'Cidade', 'id', 'nome','nome asc'  );
         $uf_id = new TDBCombo('uf_id', 'geral', 'Uf', 'id', '{nome}','nome asc'  );
 
@@ -104,7 +105,7 @@ class VagaForm extends BasePage
         $row2 = $this->form->addFields([new TLabel(Utils::spanRequired()."Situação:", null, '14px', null)],[$situacao_id]);
         $row3 = $this->form->addFields([new TLabel(Utils::spanRequired()."Data de Abertura:", null, '14px', null)],[$data_abertura],[new TLabel(Utils::spanRequired()."Data de Fechamento:", null, '14px', null)],[$data_fechamento]);
         $row3 = $this->form->addFields([new TLabel("Data do registro:", null, '14px', null)],[$data_registro],[new TLabel("Data de Atualização:", null, '14px', null)],[$data_atualizacao]);
-        $row4 = $this->form->addFields([new TLabel(Utils::spanRequired()."Cargo:", null, '14px', null)],[$cargo_id]);
+        $row4 = $this->form->addFields([new TLabel(Utils::spanRequired()."Cargo:", null, '14px', null)],[$cargo_id],[new TLabel("Horário de Trabalho")],[$horario_trabalho]);
         $row6 = $this->form->addFields([new TLabel(Utils::spanRequired()."Setor:", null, '14px', null)],[$setor],[new TLabel("Salário:", null, '14px', null)],[$salario]);
         $row8 = $this->form->addFields([new TFormSeparator("Informações sobre a localidade da Vaga")]);
         $row9 = $this->form->addFields([new TLabel("Localização:", null, '14px', null)],[$localizacao]);
@@ -186,6 +187,8 @@ class VagaForm extends BasePage
     {
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
         $this->datagrid->style="width:100%;";
+        $this->datagrid->datatable="true";
+        
         $coluna_nome = new TDataGridColumn('usuario->name',    'Candidato',    'center');
         $coluna_data_registro = new TDataGridColumn('data_registro',    'Data Vínculo',    'center');
         
@@ -200,9 +203,9 @@ class VagaForm extends BasePage
         try{
         TTransaction::open('geral');
         $vaga_id = TSession::Getvalue('vaga_id');
+        $this->datagrid->clear();
         if($vaga_id)
         {
-            $this->datagrid->clear();
             $vinculos = VagaUsuario::where('vaga_id','=',$vaga_id)->load();
             $this->datagrid->addItems($vinculos);
         }
@@ -295,8 +298,9 @@ class VagaForm extends BasePage
      */
     public function onClear( $param )
     {
+        TSession::setValue('vaga_id',null);
         $this->form->clear(true);
-
+        $this->onReload([]);
     }
 
     public function onShow($param = null)
