@@ -31,7 +31,7 @@ class UsuarioFichaList extends TStandardList
         
         parent::setDatabase('permission');            // defines the database
         parent::setActiveRecord('UsuarioFichaView');   // defines the active record
-        parent::setDefaultOrder('id', 'asc');         // defines the default order
+        parent::setDefaultOrder('id', 'desc');         // defines the default order
         parent::addFilterField('id', '=', 'id'); // filterField, operator, formField
         parent::addFilterField('name', 'like', 'name'); // filterField, operator, formField
         parent::addFilterField('email', 'like', 'email'); // filterField, operator, formField
@@ -68,8 +68,9 @@ class UsuarioFichaList extends TStandardList
         // add the search form actions
         $btn = $this->form->addAction(_t('Find'), new TAction(array($this, 'onSearch')), 'fa:search');
         $btn->class = 'btn btn-sm btn-primary';
-        $this->form->addAction(_t('New'),  new TAction(array('SystemUserForm', 'onEdit')), 'fa:plus green');
-        
+      //  $this->form->addAction(_t('New'),  new TAction(array('SystemUserForm', 'onEdit')), 'fa:plus green');
+        $btn_onshow = $this->form->addAction("Novo Candidato", new TAction(['CandidatoForm', 'onClear']), 'fas:plus #69aa46');
+
         // creates a DataGrid
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
         //$this->datagrid->datatable = 'true';
@@ -128,7 +129,6 @@ class UsuarioFichaList extends TStandardList
         $order_email->setParameter('order', 'email');
         $column_email->setAction($order_email);
         
-
         
         // create EDIT action
         $action_edit = new TDataGridAction(array('UsuarioFichaForm', 'onEdit'));

@@ -28,7 +28,7 @@ class VagaUsuarioList extends TPage
 
         $id = new TEntry('id');
         $usuario_id = new TDBCombo('usuario_id', 'permission', 'SystemUsers', 'id', '{name}','name asc'  );
-        $vaga_id = new TDBCombo('vaga_id', 'geral', 'Vaga', 'id', '{titulo}','titulo asc'  );
+        $vaga_id = new TDBCombo('vaga_id', 'geral', 'Vaga', 'id', '{id} - {titulo}','titulo asc'  );
 
         $id->setSize(100);
         $vaga_id->setSize('100%');
@@ -37,7 +37,7 @@ class VagaUsuarioList extends TPage
         $usuario_id->enableSearch();
         $vaga_id->enableSearch();
 
-        $row1 = $this->form->addFields([new TLabel("Código da Vaga:", null, '14px', null)],[$id]);
+        $row1 = $this->form->addFields([new TLabel("Cód. Inscrição:", null, '14px', null)],[$id]);
         $row2 = $this->form->addFields([new TLabel("Candidato:", null, '14px', null)],[$usuario_id]);
         $row3 = $this->form->addFields([new TLabel("Vaga:", null, '14px', null)],[$vaga_id]);
 
@@ -60,7 +60,7 @@ class VagaUsuarioList extends TPage
         $this->datagrid->style = 'width: 100%';
         $this->datagrid->setHeight(320);
 
-        $column_id = new TDataGridColumn('id', "Código", 'center' , '70px');
+        $column_id = new TDataGridColumn('id', "Inscrição", 'center' , '70px');
         $column_usuario_name = new TDataGridColumn('usuario->name', "Candidato", 'left');
         $column_vaga_titulo = new TDataGridColumn('vaga->titulo', "Vaga", 'left');
 
