@@ -21,10 +21,15 @@ class UsuarioFichaExperiencias extends TRecord
         parent::addAttribute('usuario_id');
         parent::addAttribute('cargo_id');
         parent::addAttribute('atividades_desenvolvidas');
-        parent::addAttribute('horario_trabalho');
-        parent::addAttribute('ultimo_salario');
-        parent::addAttribute('motivo_saida');
+        parent::addAttribute('empresa');
             
+    }
+
+    function store()
+    {
+        $ficha = $this->get_usuario_ficha();
+        $this->usuario_id = $ficha->usuario_id;
+        parent::store();
     }
 
     /**

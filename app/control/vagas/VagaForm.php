@@ -2,6 +2,7 @@
 
 use Adianti\Control\TAction;
 use Adianti\Registry\TSession;
+use Adianti\Widget\Form\TButton;
 use Adianti\Widget\Form\TFormSeparator;
 use Adianti\Widget\Wrapper\TDBUniqueSearch;
 use Adianti\Wrapper\BootstrapFormBuilder;
@@ -116,9 +117,16 @@ class VagaForm extends BasePage
         $row7 = $this->form->addFields([new TLabel(Utils::spanRequired()."Resumo da vaga:", null, '14px', null)],[$resumo]);
         $row8 = $this->form->addFields([new TLabel("Requisitos Essenciais da vaga:", null, '14px', null)],[$requisitos_essenciais]);
         
+        $botao_vincular_candidato = new TButton('botao_vincular_candidato');
+        $botao_vincular_candidato->setAction(new TAction([$this,'onVincularCandidato'],['static'=>1]));
+        $botao_vincular_candidato->setLabel("Vincular Candidato");
+        $botao_vincular_candidato->setImage("fa:plus green");
+
         $this->form->appendPage("Candidatos");
         $this->criarDatagridCandidatos();
         $this->form->addContent([$this->datagrid]);
+        $this->form->addContent([$botao_vincular_candidato]);
+        $this->form->addField($botao_vincular_candidato);
         // create the form actions
         $btn_onsave = $this->form->addAction("Salvar", new TAction([$this, 'onSave']), 'fas:save #ffffff');
         $btn_onsave->addStyleClass('btn-primary'); 
@@ -138,6 +146,13 @@ class VagaForm extends BasePage
 
     }
 
+    static function onVincularCandidato($param)
+    {
+        if($param['id'])
+        {
+            TApplication::loadPage('VagaUsuarioForm','fromVaga',['vaga_id'=>$param['id'],'cargo_id'=>$param['cargo_id']]);
+        }
+    }
     static function onChangeCidade($param)
     {
         try{
@@ -270,7 +285,10 @@ class VagaForm extends BasePage
             {
                 $key = $param['key'];  // get the parameter $key
                 TTransaction::open(self::$database); // open a transaction
-
+                if(!empty($param['aba']))
+                {
+                    $this->form->setCurrentPage(--$param['aba']);
+                }
                 $object = new Vaga($key); // instantiates the Active Record 
 
                 $this->form->setData($object); // fill the form 

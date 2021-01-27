@@ -1,5 +1,15 @@
 <?php
 
+use Adianti\Control\TAction;
+use Adianti\Database\TCriteria;
+use Adianti\Database\TFilter;
+use Adianti\Registry\TSession;
+use Adianti\Widget\Form\TFormSeparator;
+use Adianti\Widget\Form\THidden;
+use Adianti\Widget\Form\TSelect;
+use Adianti\Widget\Wrapper\TDBCombo;
+use Adianti\Widget\Wrapper\TDBUniqueSearch;
+
 class VagaUsuarioForm extends TPage
 {
     protected $form;
@@ -23,20 +33,28 @@ class VagaUsuarioForm extends TPage
         $this->form->setFormTitle("Víncular de vaga ao candidato");
 
 
-        $id = new TEntry('id');
-        $usuario_id = new TDBCombo('usuario_id', 'permission', 'SystemUsers', 'id', '{name}','name asc'  );
+        $id = new THidden('id');
+        $usuario_id = new TDBCombo('usuario_id', 'permission', 'SystemUsers', 'id', '({cpf_cnpj}) {name}','name asc'  );
         $vaga_id = new TDBCombo('vaga_id', 'geral', 'Vaga', 'id', '{titulo}','titulo asc'  );
+        $cargo_id = new TDBUniqueSearch('cargo_id', 'geral', 'Cargo', 'id', 'nome','nome asc'  );
 
         $id->setEditable(false);
 
+        $cargo_id->setChangeAction(new TAction([$this,'onChangeCargo']));
+
+        //$cargo_id->enableSearch();
         $vaga_id->enableSearch();
         $usuario_id->enableSearch();
 
         $id->setSize(100);
         $vaga_id->setSize('100%');
+        $cargo_id->setSize('100%');
         $usuario_id->setSize('100%');
 
-        $row1 = $this->form->addFields([new TLabel("Id:", null, '14px', null)],[$id]);
+        $row1 = $this->form->addFields([$id]);
+        $row1 = $this->form->addContent([new TFormSeparator("Filtros para o candidato:")]);
+        $row2 = $this->form->addFields([new TLabel("Cargo:", null, '14px', null)],[$cargo_id]);
+        $row1 = $this->form->addContent([new TFormSeparator("Informações: ")]);
         $row2 = $this->form->addFields([new TLabel("Candidato:", null, '14px', null)],[$usuario_id]);
         $row3 = $this->form->addFields([new TLabel("Vaga:", null, '14px', null)],[$vaga_id]);
 
@@ -60,7 +78,15 @@ class VagaUsuarioForm extends TPage
         parent::add($this->form);
 
     }
-
+    static function onChangeCargo($param)
+    {
+        $criteria = new TCriteria;
+        if(!empty($param['cargo_id']))
+        {
+            $criteria->add(new TFilter('id','in',"NOESC:(select usuario_id from usuario_ficha_experiencias where cargo_id = ".$param['cargo_id'].")"));
+        }
+        TDBCombo::reloadFromModel(Self::$formName,'usuario_id', 'permission', 'SystemUsers', 'id', '({cpf_cnpj}) {name}','name asc' ,$criteria,true );
+    }
     public function onSave($param = null) 
     {
         try
@@ -94,9 +120,15 @@ class VagaUsuarioForm extends TPage
             // To define an action to be executed on the message close event:
             $messageAction = new TAction(['className', 'methodName']);
             **/
-
+            $fromVaga = TSession::getValue("fromVaga");
+            TSession::setValue("fromVaga",false);
             TToast::show('info', "Candidato Vinculado!"); 
-            TApplication::loadPage('VagaUsuarioList');
+            if($fromVaga)
+            {
+                TApplication::loadPage('VagaForm','onEdit',['key'=>$data->vaga_id,'id'=>$data->vaga_id,'aba'=>2]);
+            }else{
+                TApplication::loadPage('VagaUsuarioList');
+            }
             TScript::create("Template.closeRightPanel();"); 
 
         }
@@ -108,6 +140,22 @@ class VagaUsuarioForm extends TPage
             $this->form->setData( $this->form->getData() ); // keep form data
             TTransaction::rollback(); // undo all pending operations
         }
+    }
+
+    public function fromVaga($param)
+    {
+        TSession::setValue("fromVaga",true);
+        $data = new stdClass;
+        if(!empty($param['vaga_id']))
+        {
+            $data->vaga_id = $param['vaga_id'];
+        }
+        if(!empty($param['cargo_id']))
+        {
+            $data->cargo_id = $param['cargo_id'];
+        }
+        Self::onChangeCargo(['cargo_id'=>$param['cargo_id']]);
+        $this->form->setData($data);
     }
 
     public function onEdit( $param )
